@@ -39,12 +39,15 @@ booking-v3 tenants. It looks like the parser bug, and a parser fix leaves it as 
 Monday 11 May." "Client in Lisbon got Tuesday. Client in Toronto got Monday." Most likely a date converted
 between time zones. Not reproduced yet; the ticket asks the reporters for times and zones.
 
-## How the reports were split
+## How the reports were counted
+
+The desk's own way, as `CauseTable` counts on the #4471 page:
 
 1. One report per id: the export pages overlap, so some reports come twice.
-2. The desk's reading first: reports in `desk-notes.json` read as a one-day move are `timing`.
-3. Then the cause, by tenant and channel (`causes.ts`): a form report at a booking-v3 tenant is `hint`,
-   any other report from a day-first tenant is `parser`.
+2. Each report under its cause, by tenant and channel (`causes.ts`): a form report at a booking-v3 tenant is
+   `hint`, any other report from a day-first tenant is `parser`.
+3. Reports the desk read as a one-day move (`desk-notes.json`) stay counted where they are filed and are
+   counted again as `timing`, their own problem.
 
 The intake tag is not used. It guesses from the reporter's browser, and for these reports it is wrong
 often enough to split them the wrong way.

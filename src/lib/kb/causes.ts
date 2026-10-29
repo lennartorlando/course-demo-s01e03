@@ -42,15 +42,6 @@ export function causeOf(r: Pick<Report, 'channel'>, t: Tenant | undefined): Caus
   return r.channel === 'form' && DATE_HINT[t.form].startsWith('MM') ? 'hint' : 'parser';
 }
 
-// What a report needs fixed: one problem, one ticket. The desk read some reports as a one-day move
-// (desk-notes.json): those are not a flipped month, whatever their tenant, so they leave their cause.
-export type Problem = Cause | 'timing';
-export const PROBLEMS: readonly Problem[] = ['parser', 'hint', 'timing'];
-
-export function problemOf(r: Pick<Report, 'id' | 'channel'>, t: Tenant | undefined, oneDayMove: readonly string[]): Problem | null {
-  return oneDayMove.includes(r.id) ? 'timing' : causeOf(r, t);
-}
-
 export function sameCause(a: Pick<Report, 'channel'>, ta: Tenant | undefined, b: Pick<Report, 'channel'>, tb: Tenant | undefined): boolean {
   const ca = causeOf(a, ta);
   return ca !== null && ca === causeOf(b, tb);
