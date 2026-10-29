@@ -1,0 +1,59 @@
+---
+layout: runbook
+title: '#4471 · three problems, three tickets'
+owner: support desk
+status: split
+reviewed: 2026-10-29
+signature: 'v1.eyJzdWIiOiIxNTY2IiwiYXVkIjoiY2hhbGxlbmdlOndoYXQtaXQtc2hvd3MiLCJpYXQiOjE3OTMzMDQwMzgsImV4cCI6MTc5MzM5MDQzOH0.S0Ud1qcfcd_ygSKvrOdL0VFOHX7tYCf34Wzi75TR3ps'
+---
+
+<script>
+  import ProblemTable from '#lib/kb/ProblemTable.svelte';
+  import Callout from '#lib/kb/Callout.svelte';
+  import RenderStamp from '#lib/kb/RenderStamp.svelte';
+
+  const repo = 'https://github.com/lennartorlando/course-demo-s01e03';
+</script>
+
+[#4471](/kb/incidents/4471) holds every report about a booking on the wrong day, merged as one issue and
+marked known. Read the reports and they split three ways: two different ways a month gets flipped, and a
+day that moves by one. Each problem now has its own ticket. The counts below are built from the ticket
+export at render time.
+
+<ProblemTable ticket={4471} tickets={{ parser: 1, hint: 2, timing: 3 }} {repo} />
+
+<Callout kind="warn">
+Fixing the parser closes one ticket, not #4471. The form hint and the one-day move need their own fixes.
+</Callout>
+
+## The problems
+
+**`parser`, [ticket #1]({repo}/issues/1).** The shared parser reads dates month first, and every tenant in
+#4471 writes the day first. "Our 7 April reminder went out on 4 July." Every channel, every tenant.
+
+**`hint`, [ticket #2]({repo}/issues/2).** The booking-v3 form prints `MM/DD/YYYY` under its date field.
+People follow the hint, and the form reads what they typed the tenant's way, day first. Only the form, only
+booking-v3 tenants. It looks like the parser bug, and a parser fix leaves it as it is.
+
+**`timing`, [ticket #3]({repo}/issues/3).** No month flipped: "Invite says Tuesday 12 May. Calendar says
+Monday 11 May." "Client in Lisbon got Tuesday. Client in Toronto got Monday." Most likely a date converted
+between time zones. Not reproduced yet; the ticket asks the reporters for times and zones.
+
+## How the reports were split
+
+1. One report per id: the export pages overlap, so some reports come twice.
+2. The desk's reading first: reports in `desk-notes.json` read as a one-day move are `timing`.
+3. Then the cause, by tenant and channel (`causes.ts`): a form report at a booking-v3 tenant is `hint`,
+   any other report from a day-first tenant is `parser`.
+
+The intake tag is not used. It guesses from the reporter's browser, and for these reports it is wrong
+often enough to split them the wrong way.
+
+## Why one ticket held three
+
+The desk merges on subject alone ([decision 0001](/kb/decisions/0001-dedupe-by-subject)). All three
+problems arrive as "wrong day on the invite", so they met in one ticket. The #4471 page shows the split
+already: its table puts the `hint` reports in a row of their own, and a footnote says the one-day moves
+are counted under `parser`. Its headline still says one issue.
+
+<RenderStamp {signature} />
