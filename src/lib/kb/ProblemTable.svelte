@@ -7,7 +7,13 @@
   // The desk's own count (CauseTable): every report under the cause it is filed by, and the reports the
   // desk read as a one-day move (desk-notes.json) counted again as their own problem, footnoted where filed.
   type Problem = CauseGroup['cause'] | 'timing';
-  let { ticket, tickets, repo }: { ticket: number; tickets: Partial<Record<Problem, number>>; repo: string } = $props();
+  // `tickets`: the ticket filed for each problem in `repo`, by number. `states`: where each one stands, in words.
+  let {
+    ticket,
+    tickets,
+    states = {},
+    repo,
+  }: { ticket: number; tickets: Partial<Record<Problem, number>>; states?: Partial<Record<Problem, string>>; repo: string } = $props();
 
   const merged = $derived(uniqueById(reports as Report[]).filter((r) => r.mergedInto === ticket));
   const groups = $derived(groupByCause(merged, tenantOf));
@@ -22,6 +28,7 @@
       channels: [...new Set(rs.map((r) => r.channel))].sort().join(' · '),
       seen: `${days[0]} → ${days[days.length - 1]}`,
       issue: tickets[problem],
+      state: states[problem] ?? '',
     };
   };
   const rows = $derived([...groups.map((g) => row(g.cause, g.reports)), ...(moved.length ? [row('timing', moved)] : [])]);
@@ -35,7 +42,7 @@
 
 <table>
   <thead>
-    <tr><th>problem</th><th>reports</th><th>tenants</th><th>channels</th><th>seen</th><th>ticket</th></tr>
+    <tr><th>problem</th><th>reports</th><th>tenants</th><th>channels</th><th>seen</th><th>ticket</th><th>state</th></tr>
   </thead>
   <tbody>
     {#each rows as r (r.problem)}
@@ -46,6 +53,7 @@
         <td>{r.channels}</td>
         <td>{r.seen}</td>
         <td>{#if r.issue}<a href="{repo}/issues/{r.issue}">#{r.issue}</a>{:else}<span class="warn">no ticket</span>{/if}</td>
+        <td class:open={r.state === 'open'}>{r.state}</td>
       </tr>
     {/each}
   </tbody>
@@ -61,5 +69,5 @@
 <style>
   .sum { font-size: 1.1rem; }
   .note { color: var(--muted); font-size: 0.85em; }
-  .warn { color: var(--warn); font-weight: 600; }
+  .warn, .open { color: var(--warn); font-weight: 600; }
 </style>

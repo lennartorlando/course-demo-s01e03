@@ -2,7 +2,7 @@
 layout: runbook
 title: '#4471 · three problems, three tickets'
 owner: support desk
-status: split
+status: open
 reviewed: 2026-10-29
 signature: 'v1.eyJzdWIiOiIxNTY2IiwiYXVkIjoiY2hhbGxlbmdlOndoYXQtaXQtc2hvd3MiLCJpYXQiOjE3OTMzMDQwMzgsImV4cCI6MTc5MzM5MDQzOH0.S0Ud1qcfcd_ygSKvrOdL0VFOHX7tYCf34Wzi75TR3ps'
 ---
@@ -20,11 +20,27 @@ marked known. Read the reports and they split three ways: two different ways a m
 day that moves by one. Each problem now has its own ticket. The counts below are built from the ticket
 export at render time.
 
-<ProblemTable ticket={4471} tickets={{ parser: 1, hint: 2, timing: 3 }} {repo} />
+<ProblemTable
+  ticket={4471}
+  tickets={{ parser: 1, hint: 2, timing: 3 }}
+  states={{ parser: 'fixed', hint: "won't fix", timing: 'open' }}
+  {repo}
+/>
 
 <Callout kind="warn">
-Fixing the parser closes one ticket, not #4471. The form hint and the one-day move need their own fixes.
+#4471 closed on 5 October with two outcomes: the parser is fixed, and the booking-v3 form is retired. The
+one-day move was in neither. Its ticket stays open.
 </Callout>
+
+## Since #4471 closed
+
+Engineering's update of 5 October covers two of the three problems:
+
+- `parser`: fixed, `fix(dates): parse dd/mm for eu locales`. [Ticket #1]({repo}/issues/1) closed as done.
+- `hint`: won't fix, because the booking-v3 form is retired. No new reports can come in this way.
+  [Ticket #2]({repo}/issues/2) closed as not planned.
+- `timing`: not in the update. [Ticket #3]({repo}/issues/3) stays open: a parser fix does not move a day
+  back. A new report about a day off by one goes there, not to a closed ticket.
 
 ## The problems
 
